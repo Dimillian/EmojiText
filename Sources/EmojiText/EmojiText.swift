@@ -31,20 +31,27 @@ public struct EmojiText: View {
     var append: (() -> Text)?
     
     @State private var renderedEmojis = [String: RenderedEmoji]()
+    @State private var isLoading = true
     
     let logger = Logger()
     
     public var body: some View {
-        rendered
-            .task {
-                guard !emojis.isEmpty else { return }
-                
-                // Set placeholders
-                self.renderedEmojis = loadPlaceholders()
-                
-                // Load actual emojis
-                self.renderedEmojis = await loadEmojis()
+        ZStack {
+            if !isLoading {
+                rendered
             }
+        }
+        .task {
+            defer { isLoading = false }
+            guard !emojis.isEmpty else { return }
+            
+            // Set placeholders
+            self.renderedEmojis = loadPlaceholders()
+            self.isLoading = false
+            
+            // Load actual emojis
+            self.renderedEmojis = await loadEmojis()
+        }
     }
     
     var targetSize: CGSize {
