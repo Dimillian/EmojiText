@@ -87,9 +87,15 @@ public struct EmojiText: View {
                 }
                 #endif
             }
-            .onChange(of: renderedEmojis) { emojis in
-                preRendered = preRender(with: emojis)
+            #if os(visionOS)
+            .onChange(of: renderedEmojis) { _, newValue in
+                preRendered = preRender(with: newValue)
             }
+            #else
+            .onChange(of: renderedEmojis) { newValue in
+                preRendered = preRender(with: newValue)
+            }
+            #endif
     }
     
     // MARK: - Load Emojis
